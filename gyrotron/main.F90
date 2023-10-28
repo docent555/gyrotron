@@ -101,8 +101,9 @@ program orotron
       ZEND = 0.5
       !where ((ZAxis .GT. ZBEG) .AND. (ZAxis .LT. ZEND)) InitialField = 0.001*sin(pi*(ZAxis - ZBEG)/(ZEND - ZBEG))**2
       where ((ZAxis .GT. ZBEG) .AND. (ZAxis .LT. ZEND)) InitialField = sin(pi*(ZAxis - ZBEG)/(ZEND - ZBEG))**2
+      !InitialField = dcmplx(10,10)
    end if
-   
+
    !open (1, file='test.dat')
    !do i = 0, Nz
    !   write (1, '(1p2e17.7)') InitialField(i)
@@ -134,61 +135,73 @@ program orotron
    print *, 'Calcualting took:', hours, 'h :', minutes, 'm :', seconds, 's'
 #endif
 
-   !open (1, file='br.dat')
-   !do i = 0, OUTNz
-   !   write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
-   !   write (1, *) ! Assumes default "advance='yes'".
-   !end do
-   !close (1)
-   !stop
-
-   open (1, file='br.dat')
+   open (1, file='fvsz.dat')
    do i = 0, OUTNz
       write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
       do j = 0, OUTNt
-!         write (1, '(1pe17.7,a,\)') dreal(OUTP%OUTB(i, j)), ' '
-         write (1, fmt='(1x,1pe17.7,a)', advance="no") dreal(OUTF(i, j))
+         write (1, fmt='(1x,1p2e17.7,a)', advance="no") OUTF(i, j)
       end do
       write (1, *) ! Assumes default "advance='yes'".
-!      write (1, '(/,\)')
    end do
    close (1)
 
-   open (1, file='bi.dat')
+   open (1, file='ivsz.dat')
    do i = 0, OUTNz
       write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
       do j = 0, OUTNt
-!         write (1, '(1pe17.7,a,\)') dimag(OUTP%OUTB(i, j)), ' '
-         write (1, fmt='(1x,1pe17.7,a)', advance="no") dimag(OUTF(i, j))
+         write (1, fmt='(1x,1p2e17.7,a)', advance="no") OUTCu(i, j)
       end do
       write (1, *) ! Assumes default "advance='yes'".
-!      write (1, '(/,\)')
    end do
    close (1)
 
-   open (1, file='ir.dat')
-   do i = 0, OUTNz
-      write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
-      do j = 0, OUTNt
-!         write (1, '(1pe17.7,a,\)') dreal(OUTP%OUTCu(i, j)), ' '
-         write (1, fmt='(1x,1pe17.7,a)', advance="no") dreal(OUTCu(i, j))
-      end do
-      write (1, *) ! Assumes default "advance='yes'".
-!      write (1, '(/,\)')
-   end do
-   close (1)
-
-   open (1, file='ii.dat')
-   do i = 0, OUTNz
-      write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
-      do j = 0, OUTNt
-!         write (1, '(1pe17.7,a,\)') dimag(OUTP%OUTCu(i, j)), ' '
-         write (1, fmt='(1x,1pe17.7,a)', advance="no") dimag(OUTCu(i, j))
-      end do
-      write (1, *) ! Assumes default "advance='yes'".
-!      write (1, '(/,\)')
-   end do
-   close (1)
+!   open (1, file='br.dat')
+!   do i = 0, OUTNz
+!      write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
+!      do j = 0, OUTNt
+!!         write (1, '(1pe17.7,a,\)') dreal(OUTP%OUTB(i, j)), ' '
+!         write (1, fmt='(1x,1pe17.7,a)', advance="no") dreal(OUTF(i, j))
+!      end do
+!      write (1, *) ! Assumes default "advance='yes'".
+!!      write (1, '(/,\)')
+!   end do
+!   close (1)
+!
+!   open (1, file='bi.dat')
+!   do i = 0, OUTNz
+!      write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
+!      do j = 0, OUTNt
+!!         write (1, '(1pe17.7,a,\)') dimag(OUTP%OUTB(i, j)), ' '
+!         write (1, fmt='(1x,1pe17.7,a)', advance="no") dimag(OUTF(i, j))
+!      end do
+!      write (1, *) ! Assumes default "advance='yes'".
+!!      write (1, '(/,\)')
+!   end do
+!   close (1)
+!
+!   open (1, file='ir.dat')
+!   do i = 0, OUTNz
+!      write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
+!      do j = 0, OUTNt
+!!         write (1, '(1pe17.7,a,\)') dreal(OUTP%OUTCu(i, j)), ' '
+!         write (1, fmt='(1x,1pe17.7,a)', advance="no") dreal(OUTCu(i, j))
+!      end do
+!      write (1, *) ! Assumes default "advance='yes'".
+!!      write (1, '(/,\)')
+!   end do
+!   close (1)
+!
+!   open (1, file='ii.dat')
+!   do i = 0, OUTNz
+!      write (1, fmt='(1x,f14.6)', advance="no") OUTZAxis(i)
+!      do j = 0, OUTNt
+!!         write (1, '(1pe17.7,a,\)') dimag(OUTP%OUTCu(i, j)), ' '
+!         write (1, fmt='(1x,1pe17.7,a)', advance="no") dimag(OUTCu(i, j))
+!      end do
+!      write (1, *) ! Assumes default "advance='yes'".
+!!      write (1, '(/,\)')
+!   end do
+!   close (1)
 
    pause
    stop

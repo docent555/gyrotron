@@ -1,10 +1,10 @@
  &PARAM
- Ne = 128,
- Lz =  7,
+ Ne = 256,
+ Lz =  3,
  Tend = 1,
  Delta = -1.5,
  Ic = 0,
  dz = 0.005,
  dt = 0.000025
- tol = 5e-9
+ tol = 5e-12
  /
