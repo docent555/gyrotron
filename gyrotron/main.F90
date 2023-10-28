@@ -1,4 +1,4 @@
-program orotron
+program gyrotron
    use, intrinsic :: iso_c_binding
    !use types
    use functions

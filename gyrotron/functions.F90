@@ -50,7 +50,7 @@ contains
       end if
 
       C0 = dcmplx(0, -1.0D0)
-      C2 = 1.0d0/cdsqrt(Im1*pi)
+      C2 = 1.0D0/cdsqrt(Im1*pi)
       DeltaT = dt
       Nzm1 = Nz - 1
       SQRDT = dsqrt(dt)
@@ -118,26 +118,25 @@ contains
 
          WR(step) = dz*((C0*2.0D0/3.0D0/dt - kpar2(Nz)/3.0D0)*FNz(step - 1) &
                         + (C0/3.0D0/dt - kpar2(Nzm1)/6.0D0)*FNzm1(step - 1) &
-                        + 1.0D0/6.0D0*(4.0*CuNz(step - 1) + 2.0D0*CuNzm1(step - 1)) &
+                        + 1.0D0/6.0D0*(4.0D0*CuNz(step - 1) + 2.0D0*CuNzm1(step - 1)) &
                         - (2.0D0*SigmaNz(step - 1) + SigmaNzm1(step - 1)))
-
          if (step == 1) then
-            IR = 0.0
+            IR = 0
          elseif (step == 2) then
-            IR = 4.0D0/3.0D0*SQRDT*(u(0)*(1 - SQR2D2) + u(1)*(SQR2M2 - 2.5))
+            IR = 4.0D0/3.0D0*SQRDT*(u(0)*(1 - SQR2D2) + u(1)*(SQR2M2 - 2.5D0))
          else
-            IR = 4.0D0/3.0D0*SQRDT*(u(0)*((step - 1.0D0)**(1.5) - (step - 1.5)*dsqrt(dble(step))) + u(step - 1)*(SQR2M2 - 2.5))
+            IR = 4.0D0/3.0D0*SQRDT*(u(0)*((step - 1.0D0)**(1.5) - (step - 1.5D0)*dsqrt(dble(step))) + u(step - 1)*(SQR2M2 - 2.5D0))
             do j = 1, step - 2
-               IR = IR + 4.0D0/3.0D0*SQRDT*(u(j)*((step - j - 1)**(1.5) - 2.0D0*(step - j)**(1.5) + (step - j + 1)**(1.5)))
+               IR = IR + 4.0D0/3.0D0*SQRDT*(u(j)*((step - j - 1.0D0)**(1.5) - 2.0D0*(step - j)**(1.5) + (step - j + 1.0D0)**(1.5)))
             end do
          end if
 
-         D(0) = 0.0
-         D(1:Nzm1) = dz*dz*(2.0D0*cu(1:Nzm1)) &
-                     + 2.0D0*(1.0D0 + C0*dz*dz/dt - dz*dz*kpar2(1:Nzm1)/2.0D0)*field(1:Nzm1) &
+         D(1) = 0
+         D(1:Nzm1) = SQRDZ*(2.0D0*cu(1:Nzm1)) &
+                     + 2.0D0*(1.0D0 + C0*SQRDZ/dt - SQRDZ*kpar2(1:Nzm1)/2.0D0)*field(1:Nzm1) &
                      - (field(0:Nz - 2) + field(2:Nz))
-         D(Nz) = -C2*(IR + 4.0D0/3.0D0*WR(step)*SQRDT + &
-                      2.0D0/3.0D0*SQRDT*(WNzm1*field(Nzm1) + WNz*field(Nz) + WR(step - 1))*cdexp(CR*dt))
+         D(Nz) = -C2*(IR + 4.0D0/3.0D0*WR(step)*SQRDT + 2.0D0/3.0D0*SQRDT*(WNzm1*field(Nzm1) &
+                                                                           + WNz*field(Nz) + WR(step - 1))*cdexp(CR*dt))
 
          call ltridag(C, A, B, D, lfield_p)
          call rtridag(C, A, B, D, rfield_p)
@@ -156,11 +155,11 @@ contains
                            + 1.0D0/6.0D0*(2.0D0*cu_p(Nz) + 2.0D0*cu(Nz) + cu_p(Nzm1) + cu(Nzm1)) &
                            - (2.0D0*SigmaNz(step - 1) + SigmaNzm1(step - 1)))
 
-            D(1:Nzm1) = dz*dz*(cu_p(1:Nzm1) + cu(1:Nzm1)) &
-                        + 2.0D0*(1.0D0 + C0*dz*dz/dt - dz*dz*kpar2(1:Nzm1)/2.0D0)*field(1:Nzm1) &
+            D(1:Nzm1) = SQRDZ*(cu_p(1:Nzm1) + cu(1:Nzm1)) &
+                        + 2.0D0*(1 + C0*SQRDZ/dt - SQRDZ*kpar2(1:Nzm1)/2.0D0) *field(1:Nzm1) &
                         - (field(0:Nz - 2) + field(2:Nz))
-            D(Nz) = -C2*(IR + 4.0D0/3.0D0*WR(step)*SQRDT + &
-                         2.0D0/3.0D0*SQRDT*(WNzm1*field(Nzm1) + WNz*field(Nz) + WR(step - 1))*cdexp(CR*dt))
+            D(Nz) = -C2*(IR + 4.0D0/3.0D0*WR(step)*SQRDT + 2.0D0/3.0D0*SQRDT*(WNzm1*field(Nzm1) &
+                                                                              + WNz*field(Nz) + WR(step - 1))*cdexp(CR*dt))
 
             call ltridag(C, A, B, D, lfield_p)
             call rtridag(C, A, B, D, rfield_p)
@@ -177,23 +176,17 @@ contains
          call pendulumODE(theta, dthdz, field, Ne, Nz, dz)
          call Current(cu, theta, Ne, Nz, Ic)
 
-         FNz(step) = field(Nz); 
-         FNzm1(step) = field(Nzm1); 
-         CuNz(step) = cu(Nz); 
-         CuNzm1(step) = cu(Nzm1); 
-         !SigmaNz(step) = -(kpar2(Nz)/6.0D0 + C0/3.0D0/dt)*field_p(Nz) &
-         !                + (C0/3.0D0/dt - kpar2(Nz)/6.0D0)*field(Nz) &
-         !                + 1.0D0/6.0D0*(cu_p(Nz) + cu(Nz)) - SigmaNz(step - 1)
-         !SigmaNzm1(step) = -(kpar2(Nzm1)/6.0D0 + C0/3.0D0/dt)*field_p(Nzm1) &
-         !                  + (C0/3.0D0/dt - kpar2(Nzm1)/6.0D0)*field(Nzm1) &
-         !                  + 1.0D0/6.0D0*(cu_p(Nzm1) + cu(Nzm1)) - SigmaNzm1(step - 1)
-
-         SigmaNz(step) = -(kpar2(Nz)/6.0D0 + C0/3.0D0/dt)*FNz(step) &
-                         + (C0/3.0D0/dt - kpar2(Nz)/6.0D0)*FNz(step - 1) &
-                         + 1.0D0/6.0D0*(CuNz(step) + CuNz(step - 1)) - SigmaNz(step - 1)
-         SigmaNzm1(step) = -(kpar2(Nzm1)/6.0D0 + C0/3.0D0/dt)*FNzm1(step) &
-                           + (C0/3.0D0/dt - kpar2(Nzm1)/6.0D0)*FNzm1(step - 1) &
-                           + 1.0D0/6.0D0*(CuNzm1(step) + CuNzm1(step - 1)) - SigmaNzm1(step - 1)
+         FNz(step) =  field(Nz)
+         FNzm1(step) = field(Nzm1)
+         CuNz(step) = cu(Nz)
+         CuNzm1(step) = cu(Nzm1)
+    
+         SigmaNz(step) = -(kpar2(Nz)/6.0D0 + C0/3.0D0/dt) * FNz(step) &
+            + (C0/3.0D0/dt - kpar2(Nz)/6.0D0) * FNz(step-1) &
+            + 1.0D0/6.0D0*(CuNz(step) + CuNz(step-1)) - SigmaNz(step-1)
+         SigmaNzm1(step) = -(kpar2(Nzm1)/6.0D0 + C0/3.0D0/dt) * FNzm1(step) &
+            + (C0/3.0D0/dt - kpar2(Nzm1)/6.0D0) * FNzm1(step-1) &
+            + 1.0D0/6.0D0*(CuNzm1(step) + CuNzm1(step-1)) - SigmaNzm1(step-1)
 
          if (mod(step, INTT) .eq. 0) then
             OUTF(:, jout) = field(IZ)
